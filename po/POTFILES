@@ -1,0 +1,7 @@
+data/de.Teilgedanken.change-password.desktop.in
+data/de.Teilgedanken.change-password.appdata.xml.in
+data/de.Teilgedanken.change-password.gschema.xml
+src/window.ui
+src/main.py
+src/window.py
+
