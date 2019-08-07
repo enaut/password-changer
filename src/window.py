@@ -21,30 +21,29 @@ import getpass
 import crypt
 import string
 import random
+from .gi_composites import GtkTemplate
 
-@Gtk.Template(resource_path='/de/Teilgedanken/change-password/window.ui')
+@GtkTemplate(ui='/de/Teilgedanken/change-password/window.ui')
 class ChangePasswordWindow(Gtk.ApplicationWindow):
     __gtype_name__ = 'ChangePasswordWindow'
 
-    confirm = Gtk.Template.Child()
-    cancel = Gtk.Template.Child()
-    apw = Gtk.Template.Child()
-    npw = Gtk.Template.Child()
-    npwconf = Gtk.Template.Child()
-    errorlabel = Gtk.Template.Child()
-    message = Gtk.Template.Child()
+    confirm = GtkTemplate.Child()
+    cancel = GtkTemplate.Child()
+    apw = GtkTemplate.Child()
+    npw = GtkTemplate.Child()
+    npwconf = GtkTemplate.Child()
+    errorlabel = GtkTemplate.Child()
+    message = GtkTemplate.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
         self.application = kwargs["application"]
+        # This must occur *after* you initialize your base
+        self.init_template()
+
         self.confirm.connect("clicked", self.on_confirm_clicked)
         self.cancel.connect("clicked", self.on_cancel_clicked)
-
-    def salter(self):
-        ciph = "$6$"
-        characters = string.ascii_uppercase + string.ascii_lowercase + string.digits
-        salt = ''.join(random.choices(characters, k=8))
-        return ciph + salt
 
     def on_confirm_clicked(self, button):
         print("\"Click me\" button was clicked")

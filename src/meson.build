@@ -29,6 +29,7 @@ change_password_sources = [
   '__init__.py',
   'main.py',
   'window.py',
+  'gi_composites.py',
 ]
 
 install_data(change_password_sources, install_dir: moduledir)
