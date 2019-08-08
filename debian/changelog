@@ -1,0 +1,11 @@
+password-changer (0.9-1) bionic; urgency=medium
+
+  * This fixes an incompatibility with ubuntu bionic
+
+ -- Franz Dietrich <dietrich@teilgedanken.de>  Wed, 07 Aug 2019 21:24:55 +0200
+
+password-changer (0.8-1) bionic; urgency=medium
+
+  * Initial release
+
+ -- Franz Dietrich <dietrich@teilgedanken.de>  Wed, 07 Aug 2019 21:24:55 +0200

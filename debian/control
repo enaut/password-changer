@@ -1,0 +1,19 @@
+Source: password-changer
+Section: utils
+Priority: optional
+Maintainer: Franz Dietrich <dietrich@teilgedanken.de>
+Build-Depends: debhelper (>= 10), dh-python, python3-all, meson, pkgconf, libglib2.0-dev
+Standards-Version: 4.1.2
+Homepage: https://github.com/enaut/password-changer
+X-Python3-Version: >= 3.2
+Vcs-Git: https://github.com/enaut/password-changer.git
+Vcs-Browser: https://github.com/enaut/password-changer
+#Testsuite: autopkgtest-pkg-python
+
+Package: python3-password-changer
+Architecture: all
+Depends: ${python3:Depends}, ${misc:Depends}, python3-paramiko
+Suggests: python-password-changer-doc
+Description: This tool is used to change the password in an LTSP-environment. (Python 3)
+ .
+ This package installs the library for Python 3.
