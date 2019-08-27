@@ -21,7 +21,9 @@ import getpass
 import crypt
 import string
 import random
+import re
 from .gi_composites import GtkTemplate
+from gettext import gettext as _
 
 @GtkTemplate(ui='/de/Teilgedanken/change-password/window.ui')
 class ChangePasswordWindow(Gtk.ApplicationWindow):
@@ -42,30 +44,72 @@ class ChangePasswordWindow(Gtk.ApplicationWindow):
         # This must occur *after* you initialize your base
         self.init_template()
 
+        self.apw.next_field = self.npw
+        self.npw.next_field = self.npwconf
+        self.npwconf.next_field = self.confirm
+        self.apw.connect("activate", self.next_field)
+        self.npw.connect("activate", self.next_field)
+        self.npwconf.connect("activate", self.next_field)
+
+
         self.confirm.connect("clicked", self.on_confirm_clicked)
         self.cancel.connect("clicked", self.on_cancel_clicked)
 
     def on_confirm_clicked(self, button):
-        print("\"Click me\" button was clicked")
         username = getpass.getuser()
         apwv = self.apw.get_text()
         npwv = self.npw.get_text()
         npwconfv = self.npwconf.get_text()
-        if len(npwv) > 5 and (npwv == npwconfv):
-            ssh = paramiko.SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect("server", username=username, password=apwv)
-            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("passwd")
-            print("interacting")
-            ssh_stdin.write(apwv + '\n' + npwv + '\n' + npwv + '\n')
-            ssh_stdin.channel.shutdown_write()
-            print("done")
-            self.errorlabel.set_visible(True)
-            response = ssh_stderr.read().decode()
-            cleaned = response.replace("(aktuelles) UNIX-Passwort:", '').replace("Geben Sie ein neues UNIX-Passwort ein:", '').replace("Geben Sie das neue UNIX-Passwort erneut ein:", '')
-            self.message.set_text(cleaned)
+        if len(npwv) < 6:
+            self.message.set_text(_("The password is too short!"))
             self.message.set_visible(True)
-            if "erfolgreich geändert" in cleaned:
-                self.confirm.set_visible(False)
+            self.errorlabel.set_visible(True)
+        if npwv != npwconfv:
+            self.message.set_text(_("The new passwords do not match!"))
+            self.message.set_visible(True)
+            self.errorlabel.set_visible(True)
+        else:
+            try:
+                ssh = paramiko.SSHClient()
+                ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                ssh.connect("server", username=username, password=apwv)
+                ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("passwd")
+                ssh_stdin.write(apwv + '\n' + npwv + '\n' + npwv + '\n')
+                ssh_stdin.channel.shutdown_write()
+                exit_status = ssh_stdout.channel.recv_exit_status()
+
+                if exit_status == 0:
+                    self.message.set_text(_("The password has been changed"))
+                    self.message.set_visible(True)
+                    self.errorlabel.set_visible(False)
+                    self.confirm.set_visible(False)
+
+                elif exit_status == 1:
+                    self.message.set_text(_("Permission denied"))
+                    self.message.set_visible(True)
+                    self.errorlabel.set_visible(True)
+
+                elif exit_status == 10:
+                    self.message.set_text(_("The new password cannot be the same as the old one"))
+                    self.message.set_visible(True)
+                    self.errorlabel.set_visible(True)
+                else:
+                    # show some error message from the server.
+                    self.errorlabel.set_visible(True)
+                    response = ssh_stderr.read().decode()
+                    self.message.set_text(response)
+                    self.message.set_visible(True)
+
+            except paramiko.ssh_exception.AuthenticationException:
+                    self.message.set_text(_("The old password entered was not valid"))
+                    self.message.set_visible(True)
+                    self.errorlabel.set_visible(True)
+
+
     def on_cancel_clicked(self, button):
         self.application.quit()
+
+    def next_field(self, entry):
+        # Move the focus to the next field
+        if entry.next_field is not None:
+            entry.next_field.grab_focus()
