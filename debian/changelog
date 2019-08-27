@@ -1,3 +1,15 @@
+password-changer (1.0.0-ubuntu1) bionic; urgency=medium
+
+  * Make the package multilanguage capable.
+
+ -- Franz Dietrich <dietrich@teilgedanken.de>  Tue, 27 Aug 2019 20:45:25 +0200
+
+password-changer (0.9.1-1) bionic; urgency=medium
+
+  * Translate the .desktopfile
+
+ -- Franz Dietrich <dietrich@teilgedanken.de>  Wed, 08 Aug 2019 12:11:55 +0200
+
 password-changer (0.9-1) bionic; urgency=medium
 
   * This fixes an incompatibility with ubuntu bionic
